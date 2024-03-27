@@ -31,11 +31,26 @@ class LogisticRegression(object):
         Returns:
             pred_labels (array): target of shape (N,)
         """
-        ##
-        ###
-        #### WRITE YOUR CODE HERE!
-        ###
-        ##
+        C = get_n_classes(training_labels)
+        D = training_labels.shape[0]
+        training_labels_one_hot = label_to_onehot(training_labels)
+        weights = np.random.normal(0, 0.1, (D, C))
+        for it in range(self.max_iters):
+            # compute probabilities (using soft_max)
+            scores = np.exp(training_data @ weights)
+            probabilities = scores / np.sum(scores, axis=1, keepdims=True)
+
+            # compute gradient of loss cross entropy with respect to weights
+            grad_logistic_reg = training_data.T @ (probabilities - training_labels_one_hot)
+
+            # gradient step
+            weights = weights - self.lr * grad_logistic_reg
+        
+        # capture weights after training
+        self.weights = weights
+        scores = np.exp(training_data @ weights)
+        probabilities = scores / np.sum(scores, axis=1, keepdims=True)
+        pred_labels = onehot_to_label(probabilities)
         return pred_labels
 
     def predict(self, test_data):
@@ -47,9 +62,7 @@ class LogisticRegression(object):
         Returns:
             pred_labels (array): labels of shape (N,)
         """
-        ##
-        ###
-        #### WRITE YOUR CODE HERE!
-        ###
-        ##
+        scores = np.exp(test_data @ self.weights)
+        probabilities = scores / np.sum(scores, axis=1, keepdims=True)
+        pred_labels = onehot_to_label(probabilities)
         return pred_labels
