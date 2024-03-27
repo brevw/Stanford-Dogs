@@ -48,9 +48,7 @@ class LogisticRegression(object):
         
         # capture weights after training
         self.weights = weights
-        scores = np.exp(training_data @ weights)
-        probabilities = scores / np.sum(scores, axis=1, keepdims=True)
-        pred_labels = onehot_to_label(probabilities)
+        pred_labels = self.predict(self, training_data)
         return pred_labels
 
     def predict(self, test_data):

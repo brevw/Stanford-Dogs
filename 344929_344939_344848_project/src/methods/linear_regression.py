@@ -25,15 +25,15 @@ class LinearRegression(object):
                 pred_labels (np.array): target of shape (N,regression_target_size)
         """
         D = training_data.shape[1]
-        weigths = np.linalg.solve(training_data.T @ training_data + self.lmda * np.eye(D), 
+        weights = np.linalg.solve(training_data.T @ training_data + self.lmda * np.eye(D), 
                                                    training_data.T @ training_labels)
-        self.weights = weigths
-        pred_regression_targets = training_data @ weigths
+        self.weights = weights
+        pred_regression_targets = self.predict(self, training_data)
 
         return pred_regression_targets
 
 
-def predict(self, test_data):
+    def predict(self, test_data):
         """
             Runs prediction on the test data.
             
