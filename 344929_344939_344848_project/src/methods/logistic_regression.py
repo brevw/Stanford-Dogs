@@ -62,9 +62,7 @@ class LogisticRegression(object):
         Returns:
             pred_labels (array): labels of shape (N,)
         """
-        ##
-        ###
-        #### WRITE YOUR CODE HERE!
-        ###
-        ##
+        scores = np.exp(test_data @ self.weights)
+        probabilities = scores / np.sum(scores, axis=1, keepdims=True)
+        pred_labels = onehot_to_label(probabilities)
         return pred_labels
