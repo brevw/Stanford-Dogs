@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+from utils import append_bias_term
 
 class LinearRegression(object):
     """
@@ -24,11 +25,11 @@ class LinearRegression(object):
             Returns:
                 pred_labels (np.array): target of shape (N,regression_target_size)
         """
-        ##
-        ###
-        #### YOUR CODE HERE!
-        ###
-        ##
+        ## my_impl starts here
+        training_data_bias = append_bias_term(training_data)
+        pred_regression_targets = np.linalg.solve(training_data_bias.T @ training_data_bias, 
+                                                   training_data_bias.T @ training_labels)
+        ## my_impl stops here
 
         return pred_regression_targets
 
