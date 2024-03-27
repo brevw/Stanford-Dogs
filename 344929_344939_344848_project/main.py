@@ -36,6 +36,7 @@ def main(args):
 
     ##TODO: ctrain and ctest are for regression task. (To be used for Linear Regression and KNN)
     ##TODO: xtrain, xtest, ytrain, ytest are for classification task. (To be used for Logistic Regression and KNN)
+    x_train = x_train
 
 
 
@@ -48,7 +49,11 @@ def main(args):
         pass
     
     ### WRITE YOUR CODE HERE to do any other data processing
-
+    x_train = normalize_fn(x_train, np.mean(x_train, axis=0, keepdims=True), np.std(x_train, axis=0, keepdims=True))
+    y_train = normalize_fn(y_train, np.mean(y_train, axis=0, keepdims=True), np.std(y_train, axis=0, keepdims=True))
+    c_train = normalize_fn(c_train, np.mean(c_train, axis=0, keepdims=True), np.std(c_train, axis=0, keepdims=True))
+    
+    
     
 
     ## 3. Initialize the method you want to use.
@@ -61,8 +66,15 @@ def main(args):
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
 
-    elif ...:  ### WRITE YOUR CODE HERE
-        pass
+    elif args.method == "knn":
+        if args.task == "center_locating":
+            method_obj = KNN(args.K, "classification")
+        else:
+            method_obj = KNN(args.K, "regression")
+    elif args.method == "linear_regression":
+        method_obj = LinearRegression(args.lmda)
+    elif args.method == "logistic_regression":
+        method_obj = LogisticRegression(args.lr, args.max_iters)
 
 
     ## 4. Train and evaluate the method
