@@ -28,7 +28,7 @@ class LinearRegression(object):
         weights = np.linalg.solve(training_data.T @ training_data + self.lmda * np.eye(D), 
                                                    training_data.T @ training_labels)
         self.weights = weights
-        pred_regression_targets = self.predict(self, training_data)
+        pred_regression_targets = self.predict(training_data)
 
         return pred_regression_targets
 

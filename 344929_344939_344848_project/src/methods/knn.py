@@ -29,7 +29,7 @@ class KNN(object):
 
         self.training_data = training_data
         self.training_labels = training_labels
-        pred_labels = self.predict(self, training_data)
+        pred_labels = self.predict(training_data)
         return pred_labels
 
     def predict(self, test_data):
@@ -42,15 +42,15 @@ class KNN(object):
                 test_labels (np.array): labels of shape (N,)
         """
         def k_nn(example):
-            distances = np.sqrt(np.sum(np.square(self.training_data - example.reshape(-1, 1)), axis = 1))
+            distances = np.sqrt(np.sum(np.square(self.training_data - example.reshape(1, -1)), axis = 1))
             k_indices = np.argsort(distances)[:self.k]
+            k_nn_labels  = self.training_labels[k_indices]
             if (self.task_kind == "classification"):
                 #compute dominant class
-                return np.argmax(np.bincount(self.training_labels[k_indices]))
+                return np.argmax(np.bincount(k_nn_labels))
             else:
                 #compute weighted average based on inverse distances 
                 k_nn_weights = 1/distances[k_indices]
-                k_nn_labels  = self.training_labels[k_indices].reshape(-1, 1)
                 return (k_nn_weights.T @ k_nn_labels) / np.sum(k_nn_weights)
         test_labels = np.apply_along_axis(k_nn, 1, test_data)
         
