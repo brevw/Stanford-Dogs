@@ -32,7 +32,7 @@ class LogisticRegression(object):
             pred_labels (array): target of shape (N,)
         """
         C = get_n_classes(training_labels)
-        D = training_labels.shape[0]
+        D = training_data.shape[1]
         training_labels_one_hot = label_to_onehot(training_labels)
         weights = np.random.normal(0, 0.1, (D, C))
         for it in range(self.max_iters):
@@ -48,7 +48,7 @@ class LogisticRegression(object):
         
         # capture weights after training
         self.weights = weights
-        pred_labels = self.predict(self, training_data)
+        pred_labels = self.predict(training_data)
         return pred_labels
 
     def predict(self, test_data):

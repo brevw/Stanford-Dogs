@@ -36,7 +36,6 @@ def main(args):
 
     ##TODO: ctrain and ctest are for regression task. (To be used for Linear Regression and KNN)
     ##TODO: xtrain, xtest, ytrain, ytest are for classification task. (To be used for Logistic Regression and KNN)
-    x_train = x_train
 
 
 
@@ -45,14 +44,23 @@ def main(args):
 
     # Make a validation set (it can overwrite xtest, ytest)
     if not args.test:
-        ### WRITE YOUR CODE HERE
+        N = xtest.shape[0]
+        validation_size = N/2
+        rand_idx = np.random.permutation(N)
+        xval = xtest[validation_size:]
+        yval = ytest[validation_size:]
+        xtest = xtest[:validation_size]
+        ytest = ytest[:validation_size]
         pass
     
     ### WRITE YOUR CODE HERE to do any other data processing
-    x_train = normalize_fn(x_train, np.mean(x_train, axis=0, keepdims=True), np.std(x_train, axis=0, keepdims=True))
-    y_train = normalize_fn(y_train, np.mean(y_train, axis=0, keepdims=True), np.std(y_train, axis=0, keepdims=True))
-    c_train = normalize_fn(c_train, np.mean(c_train, axis=0, keepdims=True), np.std(c_train, axis=0, keepdims=True))
+    xtrain = normalize_fn(xtrain, np.mean(xtrain, axis=0, keepdims=True), np.std(xtrain, axis=0, keepdims=True))
+    ytest = normalize_fn(ytest, np.mean(ytest, axis=0, keepdims=True), np.std(ytest, axis=0, keepdims=True))
+    ctrain = normalize_fn(ctrain, np.mean(ctrain, axis=0, keepdims=True), np.std(ctrain, axis=0, keepdims=True))
     
+    xtrain = append_bias_term(xtrain)
+    ytest = append_bias_term(ytest)
+    ctrain = append_bias_term(ctrain)
     
     
 
