@@ -27,8 +27,10 @@ class LinearRegression(object):
         """
         ## my_impl starts here
         training_data_bias = append_bias_term(training_data)
-        pred_regression_targets = np.linalg.solve(training_data_bias.T @ training_data_bias, 
+        weigths = np.linalg.solve(training_data_bias.T @ training_data_bias, 
                                                    training_data_bias.T @ training_labels)
+        self.weights = weigths
+        pred_regression_targets = training_data_bias @ weigths
         ## my_impl stops here
 
         return pred_regression_targets
@@ -43,10 +45,8 @@ def predict(self, test_data):
             Returns:
                 test_labels (np.array): labels of shape (N,regression_target_size)
         """
-        ##
-        ###
-        #### YOUR CODE HERE!
-        ###
-        ##
+        ## my_impl starts here
+        pred_regression_targets = test_data @ self.weights
+        ## my_impl stops here
 
         return pred_regression_targets
