@@ -55,12 +55,7 @@ def main(args):
     
     ### WRITE YOUR CODE HERE to do any other data processing
     xtrain = normalize_fn(xtrain, np.mean(xtrain, axis=0, keepdims=True), np.std(xtrain, axis=0, keepdims=True))
-    ytest = normalize_fn(ytest, np.mean(ytest, axis=0, keepdims=True), np.std(ytest, axis=0, keepdims=True))
-    ctrain = normalize_fn(ctrain, np.mean(ctrain, axis=0, keepdims=True), np.std(ctrain, axis=0, keepdims=True))
-    
     xtrain = append_bias_term(xtrain)
-    ytest = append_bias_term(ytest)
-    ctrain = append_bias_term(ctrain)
     
     
 
