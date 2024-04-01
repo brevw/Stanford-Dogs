@@ -44,19 +44,23 @@ def main(args):
 
     # Make a validation set (it can overwrite xtest, ytest)
     if not args.test:
-        N = xtest.shape[0]
-        validation_size = N/2
+        N = xtrain.shape[0]
+        validation_size = int(N/100)
         rand_idx = np.random.permutation(N)
-        xval = xtest[validation_size:]
-        yval = ytest[validation_size:]
-        xtest = xtest[:validation_size]
-        ytest = ytest[:validation_size]
+        val_idx = rand_idx[:validation_size]
+        train_idx = rand_idx[validation_size:]
+        xval = xtrain[val_idx,:]
+        yval = ytrain[val_idx]
+        xtrain = xtrain[train_idx,:]
+        ytrain = ytrain[train_idx]
         pass
     
     ### WRITE YOUR CODE HERE to do any other data processing
     xtrain = normalize_fn(xtrain, np.mean(xtrain, axis=0, keepdims=True), np.std(xtrain, axis=0, keepdims=True))
     xtrain = append_bias_term(xtrain)
-    
+    xtest = normalize_fn(xtest, np.mean(xtest, axis=0, keepdims=True), np.std(xtest, axis=0, keepdims=True))
+    xtest = append_bias_term(xtest)
+   
     
 
     ## 3. Initialize the method you want to use.
@@ -71,9 +75,9 @@ def main(args):
 
     elif args.method == "knn":
         if args.task == "center_locating":
-            method_obj = KNN(args.K, "classification")
-        else:
             method_obj = KNN(args.K, "regression")
+        else:
+            method_obj = KNN(args.K, "classification")
     elif args.method == "linear_regression":
         method_obj = LinearRegression(args.lmda)
     elif args.method == "logistic_regression":
