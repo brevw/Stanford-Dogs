@@ -33,12 +33,19 @@ class LogisticRegression(object):
         """
         C = get_n_classes(training_labels)
         D = training_data.shape[1]
-        training_labels_one_hot = label_to_onehot(training_labels)
+        training_labels_one_hot = label_to_onehot(training_labels, C)
         weights = np.random.normal(0, 0.1, (D, C))
         for it in range(self.max_iters):
+            #compute scores (we ensure numerical stability)
+            scores = training_data @ weights
+            scores -= np.max(scores, axis = 1, keepdims = True)
+            scores = np.exp(scores)
             # compute probabilities (using soft_max)
-            scores = np.exp(training_data @ weights)
             probabilities = scores / np.sum(scores, axis=1, keepdims=True)
+
+            #debugging (to delete after)
+            loss_reg = -np.sum(training_labels_one_hot * np.log(probabilities + 1e-12))/training_data.shape[0]
+            print("loss regression = ", loss_reg)
 
             # compute gradient of loss cross entropy with respect to weights
             grad_logistic_reg = training_data.T @ (probabilities - training_labels_one_hot)
@@ -60,7 +67,11 @@ class LogisticRegression(object):
         Returns:
             pred_labels (array): labels of shape (N,)
         """
-        scores = np.exp(test_data @ self.weights)
+        #compute scores (we ensure numerical stability)
+        scores = test_data @ self.weights
+        scores -= np.max(scores, axis = 1, keepdims = True)
+        scores = np.exp(scores)
+        #compute probablities
         probabilities = scores / np.sum(scores, axis=1, keepdims=True)
         pred_labels = onehot_to_label(probabilities)
         return pred_labels

@@ -43,9 +43,10 @@ def main(args):
     #  normalize, add bias, etc.
 
     # Make a validation set (it can overwrite xtest, ytest)
+    print(args.test)
     if not args.test:
         N = xtrain.shape[0]
-        validation_size = int(N/2)
+        validation_size = int(N * 0.2)
         rand_idx = np.random.permutation(N)
         val_idx = rand_idx[:validation_size]
         train_idx = rand_idx[validation_size:]
