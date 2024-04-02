@@ -51,7 +51,11 @@ class KNN(object):
                 return np.argmax(np.bincount(k_nn_labels))
             else:
                 #compute weighted average based on inverse distances 
+<<<<<<< HEAD
                 k_nn_weights = 1/(distances[k_indices] + 1e-20)
+=======
+                k_nn_weights = 1/(distances[k_indices] + 1e-5)
+>>>>>>> origin/main
                 return (k_nn_weights.T @ k_nn_labels) / np.sum(k_nn_weights)
         test_labels = np.apply_along_axis(k_nn, 1, test_data)
         

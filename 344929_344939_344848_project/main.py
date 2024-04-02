@@ -45,16 +45,25 @@ def main(args):
     # Make a validation set (it can overwrite xtest, ytest)
     if not args.test:
         N = xtrain.shape[0]
+<<<<<<< HEAD
         validation_size = int(N/2)
+=======
+        validation_size = int(N/100)
+>>>>>>> origin/main
         rand_idx = np.random.permutation(N)
         val_idx = rand_idx[:validation_size]
         train_idx = rand_idx[validation_size:]
         xval = xtrain[val_idx,:]
         yval = ytrain[val_idx]
+<<<<<<< HEAD
         cval = ctrain[val_idx]
         xtrain = xtrain[train_idx,:]
         ytrain = ytrain[train_idx]
         ctrain = ctrain[train_idx]
+=======
+        xtrain = xtrain[train_idx,:]
+        ytrain = ytrain[train_idx]
+>>>>>>> origin/main
         pass
     
     ### WRITE YOUR CODE HERE to do any other data processing
