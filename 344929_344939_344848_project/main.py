@@ -1,5 +1,5 @@
 import argparse
-
+from matplotlib import pyplot as plt
 import numpy as np
 
 from src.data import load_data
@@ -11,6 +11,57 @@ from src.utils import normalize_fn, append_bias_term, accuracy_fn, macrof1_fn, m
 import os
 np.random.seed(100)
 
+def KFold_cross_validation(X, Y, K, method_obj):
+    '''
+    K-Fold Cross validation function for K-NN
+
+    Inputs:
+        X : training data, shape (NxD)
+        Y: training labels, shape (N,)
+        K: number of folds (K in K-fold)
+    Returns:
+        Average validation accuracy.
+    '''
+    N = X.shape[0]
+
+    if isinstance(method_obj, LogisticRegression) :
+        compute = accuracy_fn
+    elif isinstance(method_obj, LinearRegression):
+        compute = mse_fn
+    elif isinstance(method_obj, KNN) and method_obj.task_kind == "classification":
+        compute = accuracy_fn
+    else:
+        compute = mse_fn
+    
+    accuraciesVal = []  # list of accuracies
+    accuraciesTrain = []
+    #Split the data into training and validation folds:
+    all_ind = np.arange(N)
+    #all the indices of the training dataset
+    split_size = N // K
+    for fold_ind in range(K):
+        # Indices of the validation and training examples
+        val_ind = all_ind[fold_ind * split_size : (fold_ind + 1) * split_size]
+        train_ind = np.setdiff1d(all_ind, val_ind)
+        
+        X_train_fold = X[train_ind, :]
+        Y_train_fold = Y[train_ind]
+        X_val_fold = X[val_ind, :]
+        Y_val_fold = Y[val_ind]
+
+        # Run KNN using the data folds you found above.
+        # YOUR CODE HERE
+        Y_train_fold_pred = method_obj.fit(X_train_fold, Y_train_fold)
+        Y_val_fold_pred = method_obj.predict(X_val_fold)
+        acc_val = compute(Y_val_fold_pred, Y_val_fold)
+        acc_train = compute(Y_train_fold_pred, Y_train_fold)
+        accuraciesVal.append(acc_val)
+        accuraciesTrain.append(acc_train)
+    
+    #Find the average validation accuracy over K:
+    ave_acc_val = np.mean(accuraciesVal)
+    ave_acc_train = np.mean(accuraciesTrain)
+    return ave_acc_train, ave_acc_val
 
 def main(args):
     """
@@ -43,19 +94,18 @@ def main(args):
     #  normalize, add bias, etc.
 
     # Make a validation set (it can overwrite xtest, ytest)
-    print(args.test)
     if not args.test:
-        N = xtrain.shape[0]
-        validation_size = int(N * 0.2)
-        rand_idx = np.random.permutation(N)
-        val_idx = rand_idx[:validation_size]
-        train_idx = rand_idx[validation_size:]
-        xval = xtrain[val_idx,:]
-        yval = ytrain[val_idx]
-        cval = ctrain[val_idx]
-        xtrain = xtrain[train_idx,:]
-        ytrain = ytrain[train_idx]
-        ctrain = ctrain[train_idx]
+        #N = xtrain.shape[0]
+        #validation_size = int(N * 0.01)
+        #rand_idx = np.random.permutation(N)
+        #val_idx = rand_idx[:validation_size]
+        #train_idx = rand_idx[validation_size:]
+        #xval = xtrain[val_idx,:]
+        #yval = ytrain[val_idx]
+        #cval = ctrain[val_idx]
+        #train = xtrain[train_idx,:]
+        #ytrain = ytrain[train_idx]
+        #ctrain = ctrain[train_idx]
         pass
     
     ### WRITE YOUR CODE HERE to do any other data processing
@@ -63,6 +113,9 @@ def main(args):
     xtrain = append_bias_term(xtrain)
     xtest = normalize_fn(xtest, np.mean(xtest, axis=0, keepdims=True), np.std(xtest, axis=0, keepdims=True))
     xtest = append_bias_term(xtest)
+    #xval = normalize_fn(xval, np.mean(xval, axis=0, keepdims=True), np.std(xval, axis=0, keepdims=True))
+    #xval = append_bias_term(xval)
+    
    
     
 
@@ -123,6 +176,95 @@ def main(args):
         raise Exception("Invalid choice of task! Only support center_locating and breed_identifying!")
 
     ### WRITE YOUR CODE HERE if you want to add other outputs, visualization, etc.
+
+    plotLinearCenter = False
+    plotLogisticBreed = False
+    plotKnnCenter = False
+    plotKnnBreed = False
+
+    if plotLinearCenter:
+        plt.figure()
+        K = 5
+        lmdaArray = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100, 1000]
+        mse_train = []
+        mse_val   = []
+        method_obj = LinearRegression(0)
+        for lmda in lmdaArray:
+            method_obj.lmda = lmda
+            mse_train_avg, mse_val_avg = KFold_cross_validation(xtrain, ctrain, K, method_obj)
+            mse_train.append(mse_train_avg)
+            mse_val.append(mse_val_avg)
+        #plt.title(f"Impact of Regularization Strength (Lambda) on Linear Regression Performance")
+        plt.loglog(lmdaArray, mse_val, 'ro-', label = "validation set")
+        plt.loglog(lmdaArray, mse_train, 'bo-', label = "training set")
+        plt.xlabel("lambda")
+        plt.ylabel("mse")
+        plt.legend()
+        plt.show()
+    elif plotLogisticBreed:
+        plt.figure()
+        color = ["r", "b", "g", "y", "k"]
+        K = 5
+        lr_grid = [1e-4, 1e-3, 1e-2, 1e-1, 1]
+        max_iters_grid = [200, 300, 400, 600, 800]
+        accuracies_train = np.zeros((len(lr_grid), len(max_iters_grid)))
+        accuracies_val = np.zeros((len(lr_grid), len(max_iters_grid)))
+        method_obj = LogisticRegression(0, 0)
+        for i, lr in enumerate(lr_grid):
+            for j, max_iters in enumerate(max_iters_grid):
+                method_obj.lr = lr
+                method_obj.max_iters = max_iters
+                acc_train_avg, acc_val_avg = KFold_cross_validation(xtrain, ytrain, K, method_obj)
+                accuracies_train[i, j] = acc_train_avg
+                accuracies_val[i, j] = acc_val_avg
+        for i, lr in enumerate(lr_grid):
+            plt.plot(max_iters_grid, accuracies_val[i,:], "o-", color = color[i], label = f"lr = {lr}")
+        plt.xlabel("max_iters")
+        plt.ylabel("accuracy (%)")
+        #plt.title("Impact of Learning Rate and Maximum Iterations on Model Accuracy")
+        plt.legend()
+        plt.show()
+    elif plotKnnBreed:
+        plt.figure()
+        K = 5
+        k_grid = [1, 5, 10, 15, 20, 30, 40]
+        accuracies_train = []
+        accuracies_val   = []
+        method_obj = KNN(0, "classification")
+        for k in k_grid:
+            method_obj.k = k
+            acc_train_avg, acc_val_avg = KFold_cross_validation(xtrain, ytrain, K, method_obj)
+            accuracies_train.append(acc_train_avg)
+            accuracies_val.append(acc_val_avg)
+        plt.plot(k_grid, accuracies_val, 'bo-', label = "validation set")
+        plt.plot(k_grid, accuracies_train, 'ro-', label = "training set")
+        plt.xlabel("k")
+        plt.ylabel("accuracy (%)")
+        #plt.title("Finding the Optimal k: Performance Analysis of kNN (classification)")
+        plt.legend()
+        plt.show()
+    elif plotKnnCenter:
+        plt.figure()
+        K = 5
+        k_grid = [1, 5, 10, 15, 20, 30, 40]
+        mse_train = []
+        mse_val   = []
+        method_obj = KNN(0, "regression")
+        for k in k_grid:
+            method_obj.k = k
+            mse_train_avg, mse_val_avg = KFold_cross_validation(xtrain, ctrain, K, method_obj)
+            mse_train.append(mse_train_avg)
+            mse_val.append(mse_val_avg)
+        #plt.title(f"Finding the Optimal k: Performance Analysis of kNN (regression)")
+        plt.plot(k_grid, mse_val, 'ro-', label = "validation set")
+        plt.plot(k_grid, mse_train, 'bo-', label = "training set")
+        plt.xlabel("k")
+        plt.ylabel("mse")
+        plt.legend()
+        print(mse_train)
+        print(mse_val) 
+        plt.show()
+
 
 
 if __name__ == '__main__':
