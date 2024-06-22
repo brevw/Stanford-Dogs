@@ -18,6 +18,10 @@ In this project, we aim to achieve two tasks using the Stanford Dogs dataset:
 
 For a detailed walkthrough, check the [report.pdf](report.pdf) file.
 
+## Data Preparation
+
+To get started, you need to download the dataset features from the following link: [Stanford Dogs Dataset](http://vision.stanford.edu/aditya86/ImageNetDogs/train_data.mat). Once downloaded, move it to this project folder.
+
 ## Usage
 
 To run the models with optimized hyperparameters, use the following commands:
