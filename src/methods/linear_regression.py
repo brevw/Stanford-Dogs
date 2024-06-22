@@ -8,12 +8,13 @@ class LinearRegression(object):
         Recall that linear regression is just ridge regression with lambda=0.
     """
 
-    def __init__(self, lmda):
+    def __init__(self, lmda,task_kind ="regression"):
         """
             Initialize the task_kind (see dummy_methods.py)
             and call set_arguments function of this class.
         """
         self.lmda = lmda
+        self.task_kind = task_kind
 
     def fit(self, training_data, training_labels):
         """
@@ -24,6 +25,7 @@ class LinearRegression(object):
             Returns:
                 pred_labels (np.array): target of shape (N,regression_target_size)
         """
+        
         D = training_data.shape[1]
         weights = np.linalg.solve(training_data.T @ training_data + self.lmda * np.eye(D), 
                                                    training_data.T @ training_labels)
@@ -31,6 +33,7 @@ class LinearRegression(object):
         pred_regression_targets = self.predict(training_data)
 
         return pred_regression_targets
+
 
 
     def predict(self, test_data):

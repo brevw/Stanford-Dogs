@@ -8,7 +8,7 @@ class LogisticRegression(object):
     Logistic regression classifier.
     """
 
-    def __init__(self, lr, max_iters=500):
+    def __init__(self, lr, max_iters=500,task_kind ="classification"):
         """
         Initialize the new object (see dummy_methods.py)
         and set its arguments.
@@ -19,6 +19,7 @@ class LogisticRegression(object):
         """
         self.lr = lr
         self.max_iters = max_iters
+        self.task_kind = task_kind
 
 
     def fit(self, training_data, training_labels):
@@ -36,12 +37,7 @@ class LogisticRegression(object):
         training_labels_one_hot = label_to_onehot(training_labels, C)
         weights = np.random.normal(0, 0.1, (D, C))
         for it in range(self.max_iters):
-            #scores = training_data @ weights
             probabilities = self.compute_propabilities(training_data, weights)
-
-            #debugging (to delete after)
-            #loss_reg = -np.sum(training_labels_one_hot * np.log(probabilities + 1e-12))/training_data.shape[0]
-            #print("loss regression = ", loss_reg)
 
             # compute gradient of loss cross entropy with respect to weights
             grad_logistic_reg = training_data.T @ (probabilities - training_labels_one_hot)
@@ -66,7 +62,6 @@ class LogisticRegression(object):
         probabilities = self.compute_propabilities(test_data, self.weights)
         pred_labels = onehot_to_label(probabilities)
         return pred_labels
-
     def compute_propabilities(self, X, w):
         #compute scores (we ensure numerical stability)
         scores = X @ w
